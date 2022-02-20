@@ -6,6 +6,6 @@ type Database interface {
 	GetAll() ([]models.Student, error)
 	GetById(id string) (models.Student, error)
 	Create(student *models.Student) error
-	Update(id int, student models.Student) error
-	Delete(id int) (int64, error)
+	Update(id string, student *models.Student) (models.Student, error)
+	Delete(id string) error
 }

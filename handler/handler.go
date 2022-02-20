@@ -15,7 +15,6 @@ func GetStudents(c echo.Context) error {
 
 	students, err := database.GetAll()
 	if err != nil {
-
 		return c.JSON(http.StatusBadRequest, "Try again")
 	}
 
@@ -52,7 +51,6 @@ func CreateStudent(c echo.Context) error {
 		return c.JSON(http.StatusCreated, student)
 	}
 	return c.JSON(http.StatusBadRequest, "invalid fields")
-
 }
 
 func UpdateStudent(c echo.Context) error {
@@ -67,13 +65,13 @@ func UpdateStudent(c echo.Context) error {
 
 	id := c.Param("id")
 
-	err = database.Update(id, &newStudent)
+	student, err := database.Update(id, &newStudent)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "id not found")
 
 	}
-	return c.JSON(http.StatusOK, newStudent)
+	return c.JSON(http.StatusOK, student)
 
 }
 
@@ -81,9 +79,9 @@ func DeleteStudent(c echo.Context) error {
 
 	id := c.Param("id")
 
-	updates, err := database.Delete(id)
+	err := database.Delete(id)
 
-	if err != nil || updates < 1 {
+	if err != nil {
 		return c.JSON(http.StatusNotFound, "id not found")
 	}
 

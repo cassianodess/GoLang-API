@@ -2,7 +2,6 @@ package main
 
 import (
 	"main/handler"
-	"main/pkg"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,7 +21,5 @@ func main() {
 	e.DELETE("/students/:id", handler.DeleteStudent)
 
 	e.Start(":8080")
-
-	defer pkg.Db.Close()
 
 }

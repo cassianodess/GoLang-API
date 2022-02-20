@@ -16,5 +16,6 @@
 
 ### 3. Running the code
 
-1. In your terminal within directory, run `go run .`
+1. Make sure you already have `build-essential` installed on your computer, if not, run in terminal `sudo apt update` and `sudo apt install build-essential`
+1. In your terminal within directory, run `make run`
 1. Check `specifications` folder to run your requests.

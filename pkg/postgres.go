@@ -1,14 +1,15 @@
 package pkg
 
 import (
-	"database/sql"
-	conf "main/config"
+	"os"
 
 	"fmt"
 
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-var psqlConnection string = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", conf.LoadDotEnv("DB_HOST"), conf.LoadDotEnv("DB_PORT"), conf.LoadDotEnv("DB_USER"), conf.LoadDotEnv("DB_PASSWORD"), conf.LoadDotEnv("DB_NAME"))
+var psqlConnection string = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
 
-var Db, Err = sql.Open("postgres", psqlConnection)
+var Db, Err = gorm.Open(postgres.Open(psqlConnection), &gorm.Config{})

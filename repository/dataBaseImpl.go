@@ -2,62 +2,66 @@ package repository
 
 import (
 	"fmt"
+	"main/contracts"
 	"main/models"
 	"main/pkg"
 )
 
 type DataBaseImpl struct{}
 
+var dataBase contracts.Database = new(DataBaseImpl)
+
 func (dataBaseImpl DataBaseImpl) GetAll() ([]models.Student, error) {
-
-	results, err := pkg.Db.Query(`select * from students`)
-
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
 	var students []models.Student
 
-	for results.Next() {
-		var student models.Student
-		err = results.Scan(&student.Id, &student.Name, &student.Course)
+	result := pkg.Db.Order("id").Find(&students)
 
-		if err != nil {
-			println(err)
-		}
-		students = append(students, student)
+	if result.Error != nil {
+		fmt.Println(result.Error)
+		return nil, result.Error
 	}
 
-	return students, err
+	return students, result.Error
 
 }
 
 func (dataBaseImpl DataBaseImpl) GetById(id string) (models.Student, error) {
-	student := models.Student{}
+	var student models.Student
 
-	err := pkg.Db.QueryRow(`select * from students where id = $1`, id).Scan(&student.Id, &student.Name, &student.Course)
+	result := pkg.Db.First(&student, id)
 
-	return student, err
+	return student, result.Error
 }
 
 func (dataBaseImpl DataBaseImpl) Create(student *models.Student) error {
 
-	err := pkg.Db.QueryRow(`insert into students (name, course) values ($1, $2) returning id, name, course`, student.Name, student.Course).Scan(&student.Id, &student.Name, &student.Course)
+	result := pkg.Db.Create(&student)
 
-	return err
+	return result.Error
 }
 
-func (dataBaseImpl DataBaseImpl) Update(id string, student *models.Student) error {
+func (dataBaseImpl DataBaseImpl) Update(id string, student *models.Student) (models.Student, error) {
+	var oldStudent models.Student
 
-	err := pkg.Db.QueryRow(`update students set name=$1, course=$2 where id=$3 returning id, name, course`, student.Name, student.Course, id).Scan(&student.Id, &student.Name, &student.Course)
+	result := pkg.Db.First(&oldStudent, id)
 
-	return err
+	oldStudent.Name = student.Name
+	oldStudent.Course = student.Course
+
+	pkg.Db.Save(&oldStudent)
+
+	return oldStudent, result.Error
 }
 
-func (dataBaseImpl DataBaseImpl) Delete(id string) (int64, error) {
-	result, err := pkg.Db.Exec(`delete from students where id = $1`, id)
-	updates, _ := result.RowsAffected()
+func (dataBaseImpl DataBaseImpl) Delete(id string) error {
 
-	return updates, err
+	_, err := dataBase.GetById(id)
+
+	if err != nil {
+		return err
+	}
+
+	result := pkg.Db.Delete(&models.Student{}, id)
+
+	return result.Error
 }
